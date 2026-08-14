@@ -105,7 +105,10 @@ function renderProgress(m) {
   }
 
   $('p-elapsed').textContent = fmtDuration(m.elapsed);
-  $('p-found').textContent = m.found.length ? m.found.map(group).join(' , ') : 'なし';
+  // Worker から届く値は数字のみなので、そのままバッジとして描画する
+  $('p-found').innerHTML = m.found.length
+    ? m.found.map((f, i) => '<span class="mini c' + (i % 6) + '">' + group(f) + '</span>').join('')
+    : 'なし';
   const rem = m.detail.remaining;
   $('p-remain').textContent = rem === '1' ? '（完了）'
     : rem.length > 40 ? rem.slice(0, 40) + '…（' + rem.length + ' 桁）'
@@ -127,10 +130,13 @@ function renderResult(m) {
   const n = inputEl.value.trim().replace(/[,\s_]/g, '');
   $('prime-note').classList.toggle('hidden', groups.length !== 1 || groups[0].e !== 1);
 
-  const parts = groups.map(g =>
-    '<span class="num">' + group(g.v) + '</span>' + (g.e > 1 ? '<sup>' + g.e + '</sup>' : '')
+  // 素因数はバッジで表示し、色を順番に切り替える
+  const parts = groups.map((g, i) =>
+    '<span class="num c' + (i % 6) + '">' + group(g.v) +
+    (g.e > 1 ? '<sup>' + g.e + '</sup>' : '') + '</span>'
   );
-  $('factored').innerHTML = group(n) + '<span class="op">=</span>' + parts.join('<span class="op">×</span>');
+  $('factored').innerHTML = '<span class="lhs">' + group(n) + '</span>' +
+    '<span class="op">=</span>' + parts.join('<span class="op">×</span>');
 
   const tbody = $('table').querySelector('tbody');
   tbody.innerHTML = '';
