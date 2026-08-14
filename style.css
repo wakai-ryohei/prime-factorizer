@@ -145,10 +145,12 @@ button.ghost { background: var(--yellow); }
 }
 .chip:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--ink); }
 .chip:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
-.chip:nth-of-type(1) { background: var(--yellow); }
-.chip:nth-of-type(2) { background: var(--sky); }
-.chip:nth-of-type(3) { background: var(--mint); }
-.chip:nth-of-type(4) { background: var(--orange); }
+.chip:nth-of-type(6n + 1) { background: var(--yellow); }
+.chip:nth-of-type(6n + 2) { background: var(--sky); }
+.chip:nth-of-type(6n + 3) { background: var(--mint); }
+.chip:nth-of-type(6n + 4) { background: var(--orange); }
+.chip:nth-of-type(6n + 5) { background: var(--pink); }
+.chip:nth-of-type(6n + 6) { background: var(--purple); color: #fff; }
 
 .hidden { display: none !important; }
 
