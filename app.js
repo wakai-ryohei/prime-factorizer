@@ -12,6 +12,10 @@ const barFill = barEl.firstElementChild;
 
 let worker = null;
 
+const FILE_PROTOCOL_HINT =
+  'ローカルファイル（file://）として開いているため、ブラウザの制限で Web Worker を起動できません。'
+  + 'このフォルダで「python3 -m http.server 8000」を実行し、http://localhost:8000/ を開いてください。';
+
 function fmtDuration(ms) {
   if (ms < 1) return ms.toFixed(3) + ' ミリ秒';
   if (ms < 1000) return ms.toFixed(2) + ' ミリ秒';
@@ -47,7 +51,13 @@ function start() {
   if (BigInt(raw) < 2n) { showError('2 以上の整数を入力してください。'); return; }
 
   if (worker) worker.terminate();
-  worker = new Worker('factorizer.worker.js');
+  try {
+    worker = new Worker('factorizer.worker.js');
+  } catch (e) {
+    // file:// で開くとオリジンが null 扱いになり Worker の生成が拒否される
+    showError(FILE_PROTOCOL_HINT + '（' + e.message + '）');
+    return;
+  }
   worker.onmessage = onWorkerMessage;
   worker.onerror = (ev) => {
     showError('Worker でエラーが発生しました: ' + ev.message);
@@ -139,6 +149,9 @@ function renderResult(m) {
     ? '（検算 OK: 積が入力値と一致）'
     : '（検算 NG: 積が一致しません）';
 }
+
+// 実行前に気づけるよう、file:// で開かれた時点で案内を出す
+if (location.protocol === 'file:') showError(FILE_PROTOCOL_HINT);
 
 runBtn.addEventListener('click', start);
 inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') start(); });
